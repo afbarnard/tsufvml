@@ -6,3 +6,8 @@
 
 # Ignore compiled Python
 __pycache__
+
+# Ignore directories created by `setup.py`
+build
+dist
+tsufvml.egg-info
