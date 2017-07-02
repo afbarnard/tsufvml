@@ -39,8 +39,8 @@ else:
 
 # Load the data.  Open in binary mode because that's how
 # load_svmlight_file expects it.
-data_file = lzma.open(data_filename, 'rb')
-data, labels = datasets.load_svmlight_file(data_file)
+with open(data_filename, 'rb') as data_file:
+    data, labels = datasets.load_svmlight_file(data_file)
 # Densify data for older sklearns.  I actually don't know the minimum
 # version for trees to handle sparse data but I'm assuming it's 0.16.0.
 skl_version = tuple(map(int, sklearn.__version__.split('.')))
@@ -48,12 +48,12 @@ if skl_version < (0, 16, 0):
     data = data.toarray()
 
 # Load the blacklist
-blacklisted_feature_ids = None
+blacklisted_feature_ids = {0, 1} # Remove data ID, label
 if blacklist_filename is not None:
     with open(blacklist_filename, 'rt') as text:
-        blacklisted_feature_ids = set(map(int, text))
-    print('Blacklisted feature IDs:', file=sys.stderr)
-    pprint.pprint(blacklisted_feature_ids, stream=sys.stderr)
+        blacklisted_feature_ids += set(map(int, text))
+print('Blacklisted feature IDs:', file=sys.stderr)
+pprint.pprint(blacklisted_feature_ids, stream=sys.stderr)
 # Apply the blacklist
 if blacklisted_feature_ids:
     print('Removing blacklisted features...', file=sys.stderr)
