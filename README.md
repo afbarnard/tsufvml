@@ -18,7 +18,7 @@ Requirements
 ------------
 
 * Python >= 3.4
-* Scikit-Learn >= 0.17
+* Scikit-Learn >= 0.17 (< 0.20)
 * Fitamord >= 0.1
 
 
@@ -129,6 +129,27 @@ Installation
    If you want to install Tsufvml user-wide instead of just in your workspace, add the `--user` option:
 
        python3 -m pip install --user --editable git+https://github.com/afbarnard/tsufvml.git#egg=tsufvml
+
+
+Usage
+-----
+
+First, tell Fitamord how to handle your data by generating and editing
+its configuration.  See the usage instructions in the
+[README](https://github.com/afbarnard/fitamord/blob/master/README.md).
+
+Next, use Fitamord to generate a feature vector version of your data.
+This may take several hours to run depending on the size of your data.
+
+Finally, run Tsufvml to analyze your data.  (Only decision tress are
+supported at the moment.)
+
+    python3 <path>/<to>/tsufvml/tsufvml/run_sklearn_decision_trees.py <path>/<to>/feature_vector_data.svmlight > report.yaml
+
+You can visualize the learned tree using `dot`.
+
+    sed -n -e '/digraph/,/}/ p' report.yaml > tree.dot # Excerpt the tree definition (or do by hand)
+    dot -Tpdf tree.dot > tree.pdf
 
 
 -----
