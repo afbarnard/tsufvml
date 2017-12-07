@@ -17,9 +17,11 @@ MIT License, contained in the file `LICENSE.txt`.
 Requirements
 ------------
 
-* Python >= 3.4
-* Scikit-Learn >= 0.17 (< 0.20)
-* Fitamord >= 0.1
+* [Python](https://www.python.org/) ~= 3.4
+* [Scikit-Learn](http://scikit-learn.org/) >= 0.17 (< 0.20)
+* [Fitamord](https://github.com/afbarnard/fitamord) ~= 0.1 (optional if you already have data in SVMLight format)
+* `dot` from [Graphviz](http://www.graphviz.org/) if you want to
+  visualize the model trees
 
 
 Installation
@@ -111,14 +113,19 @@ Installation
 
        python3 -m pip install --upgrade pip setuptools
 
-3. Install Fitamord (data processing prerequisite).
+3. Install [Fitamord](https://github.com/afbarnard/fitamord) (optional
+   data processing prerequisite).
 
-   Using your workspace, follow the instructions at
-   https://github.com/afbarnard/fitamord/blob/master/README.md to
-   install Fitamord.  They boil down to running the following command.
-   Note the version number.
+   Use Fitamord if you need to generate feature vector data from
+   relational data.  If you already have data in [SVMLight
+   format](http://svmlight.joachims.org/) and you just want to analyze
+   it, Fitamord is unnecessary.
 
-       python3 -m pip install --editable git+https://github.com/afbarnard/fitamord.git@v0.1.0#egg=fitamord
+   To install Fitamord, use your workspace to follow [these
+   instructions](https://github.com/afbarnard/fitamord#download-install).
+   They boil down to running the following command.
+
+       python3 -m pip install [--user] git+https://github.com/afbarnard/fitamord.git#egg=fitamord git+https://github.com/afbarnard/barnapy.git#egg=barnapy
 
 3. Install Tsufvml.
 
