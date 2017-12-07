@@ -25,7 +25,7 @@ setuptools.setup(
         'Tsufvml is software for conducting temporal studies (e.g. '
         'case-control studies) using typical machine learning methods '
         'that use feature vectors.'
-        ),
+    ),
     #long_description='',
     keywords=[
         'relational data',
@@ -34,7 +34,7 @@ setuptools.setup(
         'feature functions',
         'data science',
         'machine learning',
-        ],
+    ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Console',
@@ -44,14 +44,22 @@ setuptools.setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3 :: Only',
         'Topic :: Scientific/Engineering :: Information Analysis',
-        ],
+    ],
 
     # Requirements
-    python_requires='>=3.4',
-    #install_requires=[],
+    python_requires='~=3.4',
+    #install_requires=[
+        # Do not include scikit-learn as a prerequisite because it
+        # installs well with `pip` only if NumPy and SciPy are already
+        # installed.  Therefore attempting an install is unpredictable
+        # and may lead to attempting to build everything from scratch,
+        # which is definitely not desired.
+
+        #'scikit-learn ~= 0.17, < 0.20',
+    #],
 
     # API
     packages=setuptools.find_packages(),
     #entry_points={}, # for scripts
 
-    )
+)
