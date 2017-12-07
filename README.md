@@ -121,7 +121,7 @@ Installation
    format](http://svmlight.joachims.org/) and you just want to analyze
    it, Fitamord is unnecessary.
 
-   To install Fitamord, use your workspace to follow [these
+   To install Fitamord, use your workspace to follow the [install
    instructions](https://github.com/afbarnard/fitamord#download-install).
    They boil down to running the following command.
 
@@ -142,8 +142,8 @@ Usage
 -----
 
 First, tell Fitamord how to handle your data by generating and editing
-its configuration.  See the usage instructions in the
-[README](https://github.com/afbarnard/fitamord/blob/master/README.md).
+its configuration.  See the [usage
+instructions](https://github.com/afbarnard/fitamord#usage).
 
 Next, use Fitamord to generate a feature vector version of your data.
 This may take several hours to run depending on the size of your data.
