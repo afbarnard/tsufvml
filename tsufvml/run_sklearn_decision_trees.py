@@ -7,6 +7,22 @@ format
 # under the MIT License.  See `LICENSE.txt` for details.
 
 
+# TODO break into functions
+# TODO put functions in importable module
+# TODO convert script to main()
+# TODO have setuptools install script
+# TODO map blacklisted IDs to original IDs
+# TODO look up original IDs in feature table (optional)
+# TODO look up concept IDs in concept table (optional)
+# TODO allow blacklist, feature table, concept table to be specified as options on command line
+# TODO allow concept table columns to be specified in options; need ID, desc
+# TODO change report of important features to table with fields (rank, feat_id, importance, feat_name, feat_desc)
+# TODO change dot output to use feature names (if features table provided, else feature IDs is fine)
+# TODO clean up spacing in report
+# TODO generate tree PDF (if dot package installed, if requested with command line option for file, e.g. `--tree-pdf=dt.pdf`)
+# TODO update README with instructions for invoking new script
+
+
 import io
 import lzma
 import operator
