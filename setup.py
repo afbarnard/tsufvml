@@ -12,7 +12,13 @@
 
 import setuptools
 
-import tsufvml.version
+import tsufvml
+
+
+# Get the description from the package documentation
+_desc_paragraphs = tsufvml.__doc__.strip().split('\n\n')
+_desc_short = _desc_paragraphs[0].replace('\n', ' ') # Needs to be one line
+_desc_long = _desc_paragraphs[1]
 
 
 # Define package attributes
@@ -20,24 +26,16 @@ setuptools.setup(
 
     # Basic characteristics
     name='tsufvml',
-    version=tsufvml.version.__version__,
+    version=tsufvml.__version__,
     url='https://github.com/afbarnard/tsufvml',
     license='MIT',
     author='Aubrey Barnard',
     #author_email='',
 
     # Description
-    description=(
-        'Tsufvml is software for conducting temporal studies (e.g. '
-        'case-control studies) using typical machine learning methods '
-        'that use feature vectors.'
-    ),
-    #long_description='',
+    description=_desc_short,
+    long_description=_desc_long,
     keywords=[
-        'relational data',
-        'data preparation',
-        'data modeling',
-        'feature functions',
         'data science',
         'machine learning',
     ],
