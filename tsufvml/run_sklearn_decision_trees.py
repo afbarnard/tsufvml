@@ -233,8 +233,49 @@ print()
 #print(textwrap.indent(dot_text.getvalue(), '  '))
 print('overall tree: |')
 print(textwrap.indent(new_dot_text.getvalue(), '  '))
-print('tree feature legend:')
-for feat_nm in sorted(feat_legend.keys()):
-    print('  ', feat_nm, ': ', repr(feat_legend[feat_nm]), sep='')
+if feat_legend:
+    print('\ntree feature legend:')
+    for feat_nm in sorted(feat_legend.keys()):
+        print('  ', feat_nm, ': ', repr(feat_legend[feat_nm]), sep='')
 # EOF
 print('...')
+
+tree_render_basename = "tsufvml_learned_decision_tree"
+
+# Render tree as PDF using PyDot if available
+render_success = False
+try:
+    import pydot
+    graphs = pydot.graph_from_dot_data(new_dot_text.getvalue())
+    graphs[0].write(
+        tree_render_basename + '.pdf', format='pdf', prog='dot')
+    render_success = True
+except ImportError:
+    pass
+
+if not render_success:
+    # Render tree as PDF using Graphviz if available
+    try:
+        import graphviz
+        graph = graphviz.Source(
+            new_dot_text.getvalue(),
+            format='pdf',
+            engine='dot',
+        )
+        graph.render(tree_render_basename, cleanup=True)
+        render_success = True
+    except ImportError:
+        pass
+
+# Warn if rendering unsuccessful
+if not render_success:
+    print(
+        """
+
+Warning: Unable to render the decision tree as a PDF using either the
+    `pydot` or `graphviz` packages.  If you want automatic rendering,
+    make sure one of those packages is installed and try again.
+
+        """.strip(),
+        file=sys.stderr,
+    )
