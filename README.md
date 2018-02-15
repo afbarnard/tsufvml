@@ -19,13 +19,21 @@ Requirements
 
 * [Python](https://www.python.org/) ~= 3.4
 * [Scikit-Learn](http://scikit-learn.org/) >= 0.17 (< 0.20)
-* [Fitamord](https://github.com/afbarnard/fitamord) ~= 0.1 (optional if you already have data in SVMLight format)
+* [Fitamord](https://github.com/afbarnard/fitamord) ~= 0.1 (optional if
+  you already have data in SVMLight format)
 * `dot` from [Graphviz](http://www.graphviz.org/) if you want to
   visualize the model trees
+  * [`pydot`]( https://pypi.org/project/pydot/) if you want to
+    automatically generate a PDF of the model tree ([`graphviz`](
+    https://pypi.org/project/graphviz/) also works)
 
 
 Installation
 ------------
+
+This is a step-by-step guide to installing Tsufvml, but it is helpful to
+understand the material in the [tutorial on installing Python packages](
+https://packaging.python.org/tutorials/installing-packages/).
 
 1. Install Scikit-Learn.
 
@@ -127,15 +135,27 @@ Installation
 
        python3 -m pip install [--user] git+https://github.com/afbarnard/fitamord.git#egg=fitamord git+https://github.com/afbarnard/barnapy.git#egg=barnapy
 
-3. Install Tsufvml.
+4. Install Tsufvml.
 
    Using your workspace, run the following command:
 
-       python3 -m pip install --editable git+https://github.com/afbarnard/tsufvml.git#egg=tsufvml
+       python3 -m pip install --editable git+https://github.com/afbarnard/tsufvml.git#egg=tsufvml[graphviz]
+
+   The trailing "[graphviz]" tells `pip` to also install Graphviz
+   functionality.  This is optional but allows Tsufvml to automatically
+   generate a PDF of the learned decision tree (using the `pydot` Python
+   package).
 
    If you want to install Tsufvml user-wide instead of just in your workspace, add the `--user` option:
 
-       python3 -m pip install --user --editable git+https://github.com/afbarnard/tsufvml.git#egg=tsufvml
+       python3 -m pip install --user --editable git+https://github.com/afbarnard/tsufvml.git#egg=tsufvml[graphviz]
+
+   Note that `pydot` operates by calling out to the native Graphviz
+   software, so you must have Graphviz installed on your system (at
+   least the `dot` executable -- `dot.exe` on Windows).  To do that,
+   follow these instructions on [how to install Graphviz](
+   http://www.graphviz.org/download/).  You may need to also set your
+   `PATH` so that the system can find `dot`.
 
 
 Usage
@@ -153,7 +173,10 @@ supported at the moment.)
 
     python3 <path>/<to>/tsufvml/tsufvml/run_sklearn_decision_trees.py <path>/<to>/feature_vector_data.svmlight > report.yaml
 
-You can visualize the learned tree using `dot`.
+If you have either of the `pydot` or `graphviz` Python packages
+installed and a working `dot` executable, then Tsufvml with
+automatically generate a PDF of the learned decision tree.  Otherwise
+you can generate the PDF yourself using `sed` and `dot`:
 
     sed -n -e '/digraph/,/}/ p' report.yaml > tree.dot # Excerpt the tree definition (or do by hand)
     dot -Tpdf tree.dot > tree.pdf
@@ -161,5 +184,5 @@ You can visualize the learned tree using `dot`.
 
 -----
 
-Copyright (c) 2017 Aubrey Barnard.  This is free software released under
+Copyright (c) 2018 Aubrey Barnard.  This is free software released under
 the MIT License.  See `LICENSE.txt` for details.

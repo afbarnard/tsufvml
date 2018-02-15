@@ -1,7 +1,13 @@
 """Tsufvml package definition and install configuration"""
 
-# Copyright (c) 2017 Aubrey Barnard.  This is free software released
+# Copyright (c) 2018 Aubrey Barnard.  This is free software released
 # under the MIT License.  See `LICENSE.txt` for details.
+
+# References:
+# https://packaging.python.org/
+# https://setuptools.readthedocs.io/en/latest/setuptools.html
+# https://pip.pypa.io/en/latest/
+# https://www.python.org/dev/peps/pep-0440/
 
 
 import setuptools
@@ -57,6 +63,9 @@ setuptools.setup(
 
         #'scikit-learn ~= 0.17, < 0.20',
     #],
+    extras_require={
+        'graphviz': ['pydot~=1.1'],
+    },
 
     # API
     packages=setuptools.find_packages(),
