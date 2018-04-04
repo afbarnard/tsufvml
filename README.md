@@ -182,6 +182,25 @@ you can generate the PDF yourself using `sed` and `dot`:
     dot -Tpdf tree.dot > tree.pdf
 
 
+### Command Line Arguments ###
+
+If you find that the feature IDs in the report are too opaque, you can
+specify command line arguments when you invoke
+`run_sklearn_decision_trees.py`.  These arguments allow internal feature
+IDs to be mapped to more interpretable names.  The first argument is the
+data file and it is required as usual.  The optional second argument is
+the filename of the features table.  Specifying this argument enables
+mapping the internal feature ID to the feature name in the table during
+report creation.  If you are working with OMOP CDM data, then the
+feature name from the features table is probably not enough because it
+only contains a concept ID.  In that case, specify the filename of the
+concept table as the optional third argument.  This enables further
+mapping the concept ID to a concept description, which appears in a
+legend in the report.  Here is a summary of the command line arguments:
+
+    Usage: <data-file> [<features-table> [<concept-table>]]
+
+
 -----
 
 Copyright (c) 2018 Aubrey Barnard.  This is free software released under
