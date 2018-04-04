@@ -67,6 +67,11 @@ setuptools.setup(
 
     # API
     packages=setuptools.find_packages(),
-    #entry_points={}, # for scripts
+    entry_points={
+        'console_scripts': [
+            'tsufvml_decision_tree = tsufvml.cli:decision_tree_main',
+            #'tsufvml_interpret = tsufvml.cli:interpret_main',
+        ],
+    },
 
 )
