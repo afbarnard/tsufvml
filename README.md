@@ -133,7 +133,7 @@ https://packaging.python.org/tutorials/installing-packages/).
    instructions](https://github.com/afbarnard/fitamord#download-install).
    They boil down to running the following command.
 
-       python3 -m pip install [--user] https://github.com/afbarnard/fitamord.git#egg=fitamord https://github.com/afbarnard/barnapy.git#egg=barnapy https://github.com/afbarnard/esal/archive/master.zip#egg=esal
+       python3 -m pip install [--user] https://github.com/afbarnard/fitamord/archive/master.zip#egg=fitamord https://github.com/afbarnard/barnapy/archive/master.zip#egg=barnapy https://github.com/afbarnard/esal/archive/master.zip#egg=esal
 
 4. Install Tsufvml.
 
@@ -174,12 +174,12 @@ supported at the moment.)
     tsufvml_decision_tree <path>/<to>/feature_vector_data.svmlight > report.yaml
 
 Note that, depending on where Tsufvml was installed and the contents of
-your `$PATH`, you may need to specify the path to
+your `PATH`, you may need to specify the path to
 `tsufvml_decision_tree` to invoke it, i.e.,
 `<prefix>/bin/tsufvml_decision_tree`.  For system-wide installs, the
 prefix is usually `/usr` or `/usr/local`, for user-wide it is
 `~/.local`, and for workspaces it is `.` (the current directory).
-Activating a workspace sets up your `$PATH`, so you shouldn't have to
+Activating a workspace sets up your `PATH`, so you shouldn't have to
 worry about this when using a workspace.
 
 If you have either of the `pydot` or `graphviz` Python packages
