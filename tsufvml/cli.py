@@ -22,7 +22,7 @@ def run_decision_trees_api(
         data_matrix_filename,
         feature_table_filename=None,
         concept_table_filename=None,
-        tree_pdf_filename='tree.pdf',
+        tree_pdf_filename=None,
         output=sys.stdout,
 ):
     # Do expensive imports
@@ -71,19 +71,20 @@ def run_decision_trees_api(
         model_text=dot_text,
         feature_legend=feature_legend,
     )
-    # Render tree as PDF
-    render_ok = common.render_dot_as_pdf(dot_text, tree_pdf_filename)
-    if not render_ok:
-        print(
-            """
+    # Render tree as PDF if requested
+    if tree_pdf_filename is not None:
+        render_ok = common.render_dot_as_pdf(dot_text, tree_pdf_filename)
+        if not render_ok:
+            print(
+                """
 
 Warning: Unable to render the decision tree as a PDF using either the
-    `pydot` or `graphviz` packages.  If you want automatic rendering,
-    make sure one of those packages is installed and try again.
+    `pydot` or `graphviz` packages.  If you want PDF rendering, make
+    sure one of those packages is installed and try again.
 
-            """.strip(),
-              file=sys.stderr,
-          )
+                """.strip(),
+                file=sys.stderr,
+            )
 
 
 def decision_tree(prog_name, *args):
@@ -105,19 +106,28 @@ def decision_tree(prog_name, *args):
         '--features',
         type=argparse.FileType('rt'),
         metavar='FILE',
-        help='Table of features in delimited format',
+        help=(
+            'Table of features in delimited format.  Only the features '
+            'found in this table will be used for modeling.  '
+            'Otherwise, all the features found in the data will be '
+            'used.'),
     )
     arg_prsr.add_argument(
         '--concepts',
         type=argparse.FileType('rt'),
         metavar='FILE',
-        help='Table of concepts in delimited format',
+        help=(
+            'Table of concepts in delimited format.  If provided, '
+            'concepts will be included in the report alongside '
+            'matching feature names.'),
     )
     arg_prsr.add_argument(
         '--pdf',
         type=pathlib.Path,
         metavar='FILE',
-        help='Filename for PDF output',
+        help=(
+            'Filename for PDF rendering of decision tree.  If you want '
+            'a PDF, you must specify a filename with this option.'),
     )
     env = arg_prsr.parse_args(args)
     env = vars(env) # Convert to dictionary
