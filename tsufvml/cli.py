@@ -104,19 +104,19 @@ def decision_tree(prog_name, *args):
     arg_prsr.add_argument(
         '--features',
         type=argparse.FileType('rt'),
-        metavar='TABLE',
+        metavar='FILE',
         help='Table of features in delimited format',
     )
     arg_prsr.add_argument(
         '--concepts',
         type=argparse.FileType('rt'),
-        metavar='TABLE',
+        metavar='FILE',
         help='Table of concepts in delimited format',
     )
     arg_prsr.add_argument(
         '--pdf',
         type=pathlib.Path,
-        metavar='PATH',
+        metavar='FILE',
         help='Filename for PDF output',
     )
     env = arg_prsr.parse_args(args)
