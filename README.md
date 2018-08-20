@@ -139,7 +139,7 @@ https://packaging.python.org/tutorials/installing-packages/).
 
    Using your workspace, run the following command:
 
-       python3 -m pip install https://github.com/afbarnard/tsufvml.git#egg=tsufvml[graphviz]
+       python3 -m pip install https://github.com/afbarnard/tsufvml/archive/master.zip#egg=tsufvml[graphviz]
 
    The trailing "[graphviz]" tells `pip` to also install Graphviz
    functionality.  This is optional but allows Tsufvml to generate a PDF
@@ -148,7 +148,7 @@ https://packaging.python.org/tutorials/installing-packages/).
    If you want to install Tsufvml user-wide instead of just in your
    workspace, add the `--user` option:
 
-       python3 -m pip install --user https://github.com/afbarnard/tsufvml.git#egg=tsufvml[graphviz]
+       python3 -m pip install --user https://github.com/afbarnard/tsufvml/archive/master.zip#egg=tsufvml[graphviz]
 
    Note that `pydot` operates by calling out to the native Graphviz
    software, so you must have Graphviz installed on your system (at
