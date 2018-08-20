@@ -12,4 +12,4 @@ the MIT License.  See `LICENSE.txt` for details.
 # copyright notice in the package documentation.
 
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'

@@ -23,8 +23,8 @@ Requirements
   you already have data in SVMLight format)
 * `dot` from [Graphviz](http://www.graphviz.org/) if you want to
   visualize the model trees
-  * [`pydot`]( https://pypi.org/project/pydot/) if you want to
-    automatically generate a PDF of the model tree ([`graphviz`](
+  * [`pydot`]( https://pypi.org/project/pydot/) if you want to generate
+    a PDF of the model tree ([`graphviz`](
     https://pypi.org/project/graphviz/) also works)
 
 
@@ -63,9 +63,9 @@ https://packaging.python.org/tutorials/installing-packages/).
        conda update conda
 
    To install Scikit-Learn with Conda run the following commands.  Like
-   Python, Conda uses environments to isolate installations of packages
-   from one another, so it's best to create an environment for this
-   software rather than use the default (root) environment.
+   Python, Conda uses environments to isolate installations (sets of
+   packages) from one another, so it's best to create an environment for
+   this software rather than use the default (root) environment.
 
        conda create --name tsufvml python=3 scikit-learn
 
@@ -133,22 +133,22 @@ https://packaging.python.org/tutorials/installing-packages/).
    instructions](https://github.com/afbarnard/fitamord#download-install).
    They boil down to running the following command.
 
-       python3 -m pip install [--user] git+https://github.com/afbarnard/fitamord.git#egg=fitamord git+https://github.com/afbarnard/barnapy.git#egg=barnapy
+       python3 -m pip install [--user] https://github.com/afbarnard/fitamord.git#egg=fitamord https://github.com/afbarnard/barnapy.git#egg=barnapy https://github.com/afbarnard/esal/archive/master.zip#egg=esal
 
 4. Install Tsufvml.
 
    Using your workspace, run the following command:
 
-       python3 -m pip install --editable git+https://github.com/afbarnard/tsufvml.git#egg=tsufvml[graphviz]
+       python3 -m pip install https://github.com/afbarnard/tsufvml.git#egg=tsufvml[graphviz]
 
    The trailing "[graphviz]" tells `pip` to also install Graphviz
-   functionality.  This is optional but allows Tsufvml to automatically
-   generate a PDF of the learned decision tree (using the `pydot` Python
-   package).
+   functionality.  This is optional but allows Tsufvml to generate a PDF
+   of the learned decision tree (using the `pydot` Python package).
 
-   If you want to install Tsufvml user-wide instead of just in your workspace, add the `--user` option:
+   If you want to install Tsufvml user-wide instead of just in your
+   workspace, add the `--user` option:
 
-       python3 -m pip install --user --editable git+https://github.com/afbarnard/tsufvml.git#egg=tsufvml[graphviz]
+       python3 -m pip install --user https://github.com/afbarnard/tsufvml.git#egg=tsufvml[graphviz]
 
    Note that `pydot` operates by calling out to the native Graphviz
    software, so you must have Graphviz installed on your system (at
@@ -168,37 +168,60 @@ instructions](https://github.com/afbarnard/fitamord#usage).
 Next, use Fitamord to generate a feature vector version of your data.
 This may take several hours to run depending on the size of your data.
 
-Finally, run Tsufvml to analyze your data.  (Only decision tress are
+Finally, run Tsufvml to analyze your data.  (Only decision trees are
 supported at the moment.)
 
-    python3 <path>/<to>/tsufvml/tsufvml/run_sklearn_decision_trees.py <path>/<to>/feature_vector_data.svmlight > report.yaml
+    tsufvml_decision_tree <path>/<to>/feature_vector_data.svmlight > report.yaml
+
+Note that, depending on where Tsufvml was installed and the contents of
+your `$PATH`, you may need to specify the path to
+`tsufvml_decision_tree` to invoke it, i.e.,
+`<prefix>/bin/tsufvml_decision_tree`.  For system-wide installs, the
+prefix is usually `/usr` or `/usr/local`, for user-wide it is
+`~/.local`, and for workspaces it is `.` (the current directory).
+Activating a workspace sets up your `$PATH`, so you shouldn't have to
+worry about this when using a workspace.
 
 If you have either of the `pydot` or `graphviz` Python packages
-installed and a working `dot` executable, then Tsufvml with
-automatically generate a PDF of the learned decision tree.  Otherwise
+installed and a working `dot` executable, then Tsufvml can generate a
+PDF of the learned decision tree (using the `--pdf` option).  Otherwise
 you can generate the PDF yourself using `sed` and `dot`:
 
     sed -n -e '/digraph/,/}/ p' report.yaml > tree.dot # Excerpt the tree definition (or do by hand)
     dot -Tpdf tree.dot > tree.pdf
 
 
-### Command Line Arguments ###
+### Improving Reporting ###
 
-If you find that the feature IDs in the report are too opaque, you can
-specify command line arguments when you invoke
-`run_sklearn_decision_trees.py`.  These arguments allow internal feature
-IDs to be mapped to more interpretable names.  The first argument is the
-data file and it is required as usual.  The optional second argument is
-the filename of the features table.  Specifying this argument enables
-mapping the internal feature ID to the feature name in the table during
-report creation.  If you are working with OMOP CDM data, then the
-feature name from the features table is probably not enough because it
-only contains a concept ID.  In that case, specify the filename of the
-concept table as the optional third argument.  This enables further
-mapping the concept ID to a concept description, which appears in a
-legend in the report.  Here is a summary of the command line arguments:
+In addition to rendering a decision tree as a PDF, you may want to
+improve the comprehensibility of the output of Tsufvml by translating
+internal feature IDs to meaningful names and descriptions.  There are
+command line arguments that you can specify when you invoke
+`tsufvml_decision_tree` that will do this for you: a feature table and a
+concept table.  Specifying a feature table enables translating the
+internal feature ID to a feature name from the table.  If you are
+working with OMOP CDM data, then the feature name is probably not enough
+because it only contains a concept ID.  In that case, specifying a
+concept table enables translating the concept ID to a concept
+description, which appears in a legend in the report.
 
-    Usage: <data-file> [<features-table> [<concept-table>]]
+For more help on the command line arguments, run `tsufvml_decision_tree
+--help`.
+
+
+### Excluding Features ###
+
+If you run Tsufvml directly on the output of Fitamord you will get
+perfect classification results.  This is because Fitamord includes the
+ID and label of each example in the SVMLight data (for provenance,
+debugging, etc.).  To avoid this trivial classification behavior,
+specify a feature table with only the features you want to include in
+the classification.  (When given a feature table, Tsufvml will only
+include those features that are listed in the table.)  Thus, copy the
+table of features generated by Fitamord, delete the lines containing
+features you want to exclude, and run Tsufvml while specifying your new
+table of features.  Different sets of features can be kept in different
+files to ease comparing various models; the data never needs to change.
 
 
 -----
