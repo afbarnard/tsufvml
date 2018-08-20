@@ -97,7 +97,9 @@ def load_feature_table(filename):
         num_header_lines=1,
         quoting=csv.QUOTE_NONE,
     )
-    return {int(r[id_idx]): (r[nm_idx], r[val_idx]) for r in rows}
+    return {int(r[id_idx]): (r[nm_idx] if r[nm_idx] else None,
+                             r[val_idx] if r[val_idx] else None)
+            for r in rows}
 
 
 def load_concept_table(filename):
@@ -111,7 +113,8 @@ def load_concept_table(filename):
         num_header_lines=1,
         quoting=csv.QUOTE_NONE,
     )
-    return {r[id_idx]: r[desc_idx] for r in rows}
+    return {r[id_idx]: (r[desc_idx] if r[desc_idx] else None)
+            for r in rows}
 
 
 # Reporting
