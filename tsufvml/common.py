@@ -35,10 +35,14 @@ def load_svmlight_as_matrix(filename):
         return datasets.load_svmlight_file(file)
 
 
-def read_csv(filename, num_header_lines=1, **csv_opts):
+def read_csv(
+        filename, num_header_lines=1, comment_char=None, **csv_opts):
     with open_file(filename, 'rt') as file:
         for row_idx, row in enumerate(csv.reader(file, **csv_opts)):
-            if row_idx < num_header_lines:
+            # Skip headers and comments
+            if (row_idx < num_header_lines or
+                    (comment_char is not None and
+                     row[0].startswith(comment_char))):
                 continue
             yield row
 
@@ -93,6 +97,7 @@ def load_feature_table(filename):
     val_idx = 4
     rows = read_csv(
         filename,
+        comment_char='#',
         delimiter='|',
         num_header_lines=1,
         quoting=csv.QUOTE_NONE,
