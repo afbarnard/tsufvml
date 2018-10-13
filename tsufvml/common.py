@@ -150,6 +150,7 @@ def replace_variable_references_with_features(
         rm2orig_idxs={},
         features={},
         concepts={},
+        max_description_length=30,
 ):
     # Replace the variable references with features
     feature_legend = {}
@@ -172,6 +173,15 @@ def replace_variable_references_with_features(
             if cncpt_id in concepts:
                 cncpt_desc = concepts[cncpt_id]
                 feature_legend[new_name] = cncpt_desc
+                # If the description is too long to fit entirely in the
+                # short description, include an ellipsis
+                if len(cncpt_desc) > max_description_length:
+                    short_desc = cncpt_desc[
+                        :(max_description_length - 1)] + '\u2026' # ellipsis
+                else:
+                    short_desc = cncpt_desc
+                new_name = new_name.rstrip(']') + ': {!r}]'.format(
+                    short_desc)
         else:
             new_name = 'X[{}]'.format(feat_id)
         new_text.write(new_name)
