@@ -18,7 +18,7 @@ Requirements
 ------------
 
 * [Python](https://www.python.org/) ~= 3.4
-* [Scikit-Learn](http://scikit-learn.org/) >= 0.17 (< 0.20)
+* [Scikit-Learn](http://scikit-learn.org/) >= 0.18
 * [Fitamord](https://github.com/afbarnard/fitamord) ~= 0.1 (optional if
   you already have data in SVMLight format)
 * `dot` from [Graphviz](http://www.graphviz.org/) if you want to

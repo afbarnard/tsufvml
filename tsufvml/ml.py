@@ -6,7 +6,7 @@
 
 import io
 
-from sklearn import cross_validation as cv
+from sklearn import model_selection
 from sklearn import metrics
 from sklearn import tree
 
@@ -22,7 +22,8 @@ def run_cv_and_final_model(model, data, labels):
         '  labels: {} {}',
         model, data.shape, data.dtype, labels.shape, labels.dtype)
     # Run 10-fold cross validation and evaluate it with ROC area
-    cv_folds = cv.StratifiedKFold(labels, 10)
+    cv = model_selection.StratifiedKFold(10)
+    cv_folds = cv.split(data, labels)
     scores = []
     importances = []
     for fold_idx, fold in enumerate(cv_folds):

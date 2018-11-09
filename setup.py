@@ -59,7 +59,7 @@ setuptools.setup(
         # and may lead to attempting to build everything from scratch,
         # which is definitely not desired.
 
-        #'scikit-learn ~= 0.17, < 0.20',
+        #'scikit-learn ~= 0.18',
     #],
     extras_require={
         'graphviz': ['pydot~=1.1'],
