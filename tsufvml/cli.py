@@ -1,7 +1,9 @@
 """Entry points for scripts and APIs for foreign code"""
 
-# Copyright (c) 2018 Aubrey Barnard.  This is free software released
-# under the MIT License.  See `LICENSE.txt` for details.
+# Copyright (c) 2018-2019 Aubrey Barnard.
+#
+# This is free software released under the MIT License.  See
+# `LICENSE.txt` for details.
 
 
 import argparse
@@ -11,6 +13,7 @@ import pathlib
 import sys
 
 from barnapy import logging
+from barnapy import parse
 
 # Use absolute imports so that this file can be used from anywhere.
 # Postpone expensive imports (i.e. sklearn) until needed.
@@ -18,11 +21,42 @@ import tsufvml
 from tsufvml import common
 
 
+def parse_args_as_dict(*args, key_prefix='--', value_parser=None):
+    env = {}
+    arg_idx = 0
+    while arg_idx < len(args):
+        arg = args[arg_idx]
+        if key_prefix is not None and not arg.startswith(key_prefix):
+            raise argparse.ArgumentError(
+                None, 'Unrecognized option: {}  (Must start with {!r})'
+                .format(arg, key_prefix))
+        key = arg[len(key_prefix):]
+        if not key:
+            raise argparse.ArgumentError(
+                None, 'Empty option name: {}'.format(arg))
+        if '=' in key:
+            key, value = key.split('=', 1)
+        else:
+            if arg_idx + 1 >= len(args):
+                raise argparse.ArgumentError(
+                    None, 'Missing value after option: {}'.format(arg))
+            arg_idx += 1
+            value = args[arg_idx]
+        if value_parser is not None:
+            value, err = value_parser(value)
+            if err:
+                raise argparse.ArgumentError(None, err)
+        env[key] = value
+        arg_idx += 1
+    return env
+
+
 def run_decision_trees_api(
         data_matrix_filename,
         feature_table_filename=None,
         concept_table_filename=None,
         tree_pdf_filename=None,
+        decision_tree_args={},
         output=sys.stdout,
 ):
     # Do expensive imports
@@ -42,8 +76,9 @@ def run_decision_trees_api(
     concepts = {}
     if concept_table_filename is not None:
         concepts = common.load_concept_table(concept_table_filename)
+    # Construct the decision tree classifier
+    dt_model = ml.tree.DecisionTreeClassifier(**decision_tree_args)
     # Run the decision tree classifier
-    dt_model = ml.mk_decision_tree()
     final_model, cv_roc_areas, feature_importances, final_roc = (
         ml.run_cv_and_final_model(dt_model, data, labels))
     # Average the feature importances over all folds
@@ -129,14 +164,25 @@ def decision_tree(prog_name, *args):
             'Filename for PDF rendering of decision tree.  If you want '
             'a PDF, you must specify a filename with this option.'),
     )
-    env = arg_prsr.parse_args(args)
-    env = vars(env) # Convert to dictionary
+    # Parse regular CLI arguments
+    env, extra_args = arg_prsr.parse_known_args(args)
+    env = vars(env) # Convert `argparse.Namespace` to dictionary
+    # Parse decision tree arguments
+    try:
+        dt_args = parse_args_as_dict(
+            *extra_args,
+            key_prefix='--dt.',
+            value_parser=parse.atom_err)
+    except argparse.ArgumentError as e:
+        arg_prsr.error(str(e))
+    # Start!
     logging.default_config()
     run_decision_trees_api(
-        env.get('data'),
-        env.get('features'),
-        env.get('concepts'),
-        env.get('pdf'),
+        data_matrix_filename=env.get('data'),
+        feature_table_filename=env.get('features'),
+        concept_table_filename=env.get('concepts'),
+        tree_pdf_filename=env.get('pdf'),
+        decision_tree_args=dt_args,
     )
 
 

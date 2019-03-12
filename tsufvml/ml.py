@@ -1,7 +1,9 @@
 """Machine learning algorithms"""
 
-# Copyright (c) 2018 Aubrey Barnard.  This is free software released
-# under the MIT License.  See `LICENSE.txt` for details.
+# Copyright (c) 2018-2019 Aubrey Barnard.
+#
+# This is free software released under the MIT License.  See
+# `LICENSE.txt` for details.
 
 
 import io
@@ -54,15 +56,6 @@ def run_cv_and_final_model(model, data, labels):
     final_score = metrics.roc_auc_score(labels, predictions)
     logger.info('Done run_cv_and_final_model')
     return model, scores, importances, final_score
-
-
-def mk_decision_tree():
-    return tree.DecisionTreeClassifier(
-        max_features=None, # Consider all features
-        max_depth=4,
-        min_samples_leaf=10,
-        class_weight='balanced', # Treat classes equally regardless of skew
-    )
 
 
 def render_decision_tree_as_graphviz(dt_model):
