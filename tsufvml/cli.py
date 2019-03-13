@@ -56,34 +56,66 @@ def run_decision_trees_api(
         feature_table_filename=None,
         concept_table_filename=None,
         tree_pdf_filename=None,
+        weight_feature=None,
         decision_tree_args={},
         output=sys.stdout,
 ):
     # Do expensive imports
     from tsufvml import ml # sklearn
     import numpy
+
     # Load the data
-    data, labels = common.load_svmlight_as_matrix(data_matrix_filename)
+    full_data, labels = common.load_svmlight_as_matrix(data_matrix_filename)
     # Load the feature table
     rm2orig_idxs = {}
-    features = {}
+    features = None
     if feature_table_filename is not None:
         features = common.load_feature_table(feature_table_filename)
-        # Limit the data to the features
-        data, rm2orig_idxs = common.limit_matrix_to_features(
-            data, features)
+    else:
+        # Feature IDs are 1-based
+        features = {i + 1: (None, None) for i in range(full_data.shape[1])}
     # Load the concept table
     concepts = {}
     if concept_table_filename is not None:
         concepts = common.load_concept_table(concept_table_filename)
+
+    # Look up the column of the weight feature if needed
+    wgt_feat_id = None
+    if isinstance(weight_feature, str):
+        for (feat_id, (feat_nm, feat_val)) in features.items():
+            if weight_feature == feat_nm:
+                wgt_feat_id = feat_id
+                break
+        if wgt_feat_id is None:
+            raise ValueError('Feature name not found: {!r}'
+                             .format(weight_feature))
+    elif (isinstance(weight_feature, int)
+            and not isinstance(weight_feature, bool)):
+        wgt_feat_id = weight_feature
+    elif weight_feature is not None:
+        raise TypeError('`weight_feature` not an int or str: {!r}'
+                        .format(weight_feature))
+    # Exclude the weight feature from the features
+    if wgt_feat_id is not None and wgt_feat_id in features:
+        del features[wgt_feat_id]
+
+    # Limit the data to the features
+    data, rm2orig_idxs = common.limit_matrix_to_features(
+        full_data, features)
+    # Get the data weights
+    weights = (full_data[:, wgt_feat_id - 1].toarray().squeeze()
+               if wgt_feat_id is not None
+               else None)
+
     # Construct the decision tree classifier
     dt_model = ml.tree.DecisionTreeClassifier(**decision_tree_args)
     # Run the decision tree classifier
     final_model, cv_roc_areas, feature_importances, final_roc = (
-        ml.run_cv_and_final_model(dt_model, data, labels))
+        ml.run_cv_and_final_model(dt_model, data, labels, weights))
     # Average the feature importances over all folds
     avg_feature_importances = list(
         numpy.array(feature_importances).mean(axis=0))
+
     # Gather report data
     feature_table_header, feature_table = (
         common.mk_feature_importance_table(
@@ -106,6 +138,7 @@ def run_decision_trees_api(
         model_text=dot_text,
         feature_legend=feature_legend,
     )
+
     # Render tree as PDF if requested
     if tree_pdf_filename is not None:
         render_ok = common.render_dot_as_pdf(dot_text, tree_pdf_filename)
@@ -124,8 +157,9 @@ Warning: Unable to render the decision tree as a PDF using either the
 
 def decision_tree(prog_name, *args):
     arg_prsr = argparse.ArgumentParser(
-        prog = prog_name,
-        description = "Model feature vector data with decision trees.",
+        prog=prog_name,
+        description='Model feature vector data with decision trees.', # TODO explain --dt. options
+        allow_abbrev=False,
     )
     arg_prsr.add_argument(
         '--version',
@@ -148,6 +182,13 @@ def decision_tree(prog_name, *args):
             'used.'),
     )
     arg_prsr.add_argument(
+        '--weights',
+        metavar='FEAT',
+        help=(
+            'Feature to use as weights for the examples, as a feature '
+            'name, feature ID, or 1-based column index.'),
+    )
+    arg_prsr.add_argument(
         '--concepts',
         type=argparse.FileType('rt'),
         metavar='FILE',
@@ -167,6 +208,12 @@ def decision_tree(prog_name, *args):
     # Parse regular CLI arguments
     env, extra_args = arg_prsr.parse_known_args(args)
     env = vars(env) # Convert `argparse.Namespace` to dictionary
+    # Parse weights
+    weights_arg = env.get('weights')
+    if weights_arg is not None:
+        atom, err = parse.atom_err(weights_arg)
+        if err is None:
+            env['weights'] = atom
     # Parse decision tree arguments
     try:
         dt_args = parse_args_as_dict(
@@ -182,6 +229,7 @@ def decision_tree(prog_name, *args):
         feature_table_filename=env.get('features'),
         concept_table_filename=env.get('concepts'),
         tree_pdf_filename=env.get('pdf'),
+        weight_feature=env.get('weights'),
         decision_tree_args=dt_args,
     )
 

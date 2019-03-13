@@ -15,16 +15,22 @@ from sklearn import tree
 from barnapy import logging
 
 
-def run_cv_and_final_model(model, data, labels):
+def run_cv_and_final_model(model, data, labels, weights=None):
     logger = logging.getLogger(__name__)
     logger.info(
         'run_cv_and_final_model:\n'
-        '  model:  {}\n'
-        '  data:   {} {}\n'
-        '  labels: {} {}',
-        model, data.shape, data.dtype, labels.shape, labels.dtype)
+        '  model:   {}\n'
+        '  data:    {} {}\n'
+        '  labels:  {} {}\n'
+        '  weights: {} {}',
+        model,
+        data.shape, data.dtype,
+        labels.shape, labels.dtype,
+        weights.shape if weights is not None else None,
+        weights.dtype if weights is not None else None,
+    )
     # Run 10-fold cross validation and evaluate it with ROC area
-    cv = model_selection.StratifiedKFold(10)
+    cv = model_selection.StratifiedKFold(10, shuffle=True)
     cv_folds = cv.split(data, labels)
     scores = []
     importances = []
@@ -34,15 +40,19 @@ def run_cv_and_final_model(model, data, labels):
         # Select the training data
         train_data = data[train_idxs, :]
         train_labels = labels[train_idxs]
+        train_wgts = (weights[train_idxs]
+                      if weights is not None else None)
         # Select the testing data
         test_data = data[test_idxs, :]
         test_labels = labels[test_idxs]
+        test_wgts = weights[test_idxs] if weights is not None else None
         # Fit the model
-        model.fit(train_data, train_labels)
+        model.fit(train_data, train_labels, sample_weight=train_wgts)
         # Test
         predictions = model.predict(test_data)
         # Score
-        roc_area = metrics.roc_auc_score(test_labels, predictions)
+        roc_area = metrics.roc_auc_score(
+            test_labels, predictions, sample_weight=test_wgts)
         scores.append(roc_area)
         # Save feature importances.  Copy because we aren't guaranteed
         # to get our own array.  (I don't know what is returned because
@@ -51,9 +61,10 @@ def run_cv_and_final_model(model, data, labels):
         importances.append(model.feature_importances_.copy())
     # Fit a final model on all the data
     logger.info('Fitting final model')
-    model.fit(data, labels)
+    model.fit(data, labels, sample_weight=weights)
     predictions = model.predict(data)
-    final_score = metrics.roc_auc_score(labels, predictions)
+    final_score = metrics.roc_auc_score(
+        labels, predictions, sample_weight=weights)
     logger.info('Done run_cv_and_final_model')
     return model, scores, importances, final_score
 
